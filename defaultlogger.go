@@ -136,8 +136,8 @@ func Panic(args ...interface{}) {
 	defaultLogger.Panic(args...)
 }
 
-func Panicf(args ...interface{}) {
-	defaultLogger.Panicf(args...)
+func Panicf(format string, args ...interface{}) {
+	defaultLogger.Panicf(format, args...)
 }
 
 func Panicln(args ...interface{}) {
