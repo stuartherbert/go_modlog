@@ -46,9 +46,8 @@ func New(out io.Writer, prefix string, flag int) *Logger {
 func NewLogger(options ...LogOption) *Logger {
 	// create a new logger
 	retval := &Logger{
-		Outputs:     make(map[string]LogOutput),
-		Filters:     make(map[string]LogFilter),
-		MinLogLevel: NoticeLevel,
+		Outputs: make(map[string]LogOutput),
+		Filters: make(map[string]LogFilter),
 	}
 
 	// apply any user-provided options
@@ -88,7 +87,7 @@ func (self *Logger) AddOutput(name string, out io.Writer) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
-	output := NewLogOutput(out)
+	output := NewLogOutput(out, DefaultOutputWriter)
 	output.AddFormatter(TimestampFormatter, StdlibDateTimeFormatter)
 
 	self.Outputs[name] = *output

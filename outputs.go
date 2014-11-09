@@ -3,12 +3,21 @@
 package modlog
 
 import (
+	"fmt"
 	"io"
 	"sync"
 )
 
 // OutputWriter is the function that does the final writing to the output
 type OutputWriter func(io.Writer, *LogEntry, map[string]string)
+
+func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
+	if len(entry.Module) > 0 {
+		fmt.Fprintf(out, "%s| %s: %s", data["time"], entry.Module, entry.Message)
+	} else {
+		fmt.Fprintf(out, "%s| %s", data["time"], entry.Message)
+	}
+}
 
 // LogOutput represents a single log destination
 type LogOutput struct {
