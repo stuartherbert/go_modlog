@@ -2,6 +2,10 @@
 // Released under the 3-clause BSD license
 package modlog
 
+import (
+	"log"
+)
+
 // if the user just wants to use us as a drop-in replacement for the stdlib's
 // log package, everything will go through our default logger
 var defaultLogger *Logger
@@ -9,7 +13,9 @@ var defaultLogger *Logger
 func init() {
 	// we have to do this to guarantee order
 	initOptionsWhitelist()
-	defaultLogger = NewLogger()
+	defaultLogger = NewLogger(
+		SetStdlibFlags(log.LstdFlags),
+	)
 }
 
 func SetOptions(logOptions ...LogOption) {
