@@ -3,6 +3,7 @@
 package modlog
 
 import (
+	_ "fmt"
 	"io"
 
 	"github.com/stuartherbert/go_options"
@@ -55,7 +56,10 @@ func SetStdlibPrefix(prefix string) LogOption {
 func SetMinLogLevel(level LogLevel) LogOption {
 	return func(self *Logger) error {
 		// record the log level
-		self.Options.SetOption("minLogLevel", level)
+		err := self.Options.SetOption("minLogLevel", level)
+		if err != nil {
+			panic(err)
+		}
 
 		// add the required filter if needed
 		if level < TraceLevel {
