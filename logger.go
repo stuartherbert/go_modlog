@@ -326,6 +326,8 @@ func (self *Logger) Prefix() string {
 }
 
 func (self *Logger) Print(args ...interface{}) {
+	entry := NewLogEntry(InfoLevel, "", fmt.Sprint(args...))
+	self.processEntry(entry)
 }
 
 func (self *Logger) Printf(format string, args ...interface{}) {
@@ -333,8 +335,9 @@ func (self *Logger) Printf(format string, args ...interface{}) {
 	self.processEntry(entry)
 }
 
-func (self *Logger) Println(v ...interface{}) {
-
+func (self *Logger) Println(args ...interface{}) {
+	entry := NewLogEntry(InfoLevel, "", fmt.Sprintln(args...))
+	self.processEntry(entry)
 }
 
 func (self *Logger) SetFlags(flag int) {
