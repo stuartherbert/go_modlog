@@ -1,5 +1,7 @@
 // Copyright (c) 2014-present Stuart Herbert
 // Released under a 3-clause BSD license
+//
+// This simple example shows you what the default output looks like
 package main
 
 import (
