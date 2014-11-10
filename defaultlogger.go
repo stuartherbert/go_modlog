@@ -7,6 +7,8 @@ package modlog
 var defaultLogger *Logger
 
 func init() {
+	// we have to do this to guarantee order
+	initOptionsWhitelist()
 	defaultLogger = NewLogger()
 }
 

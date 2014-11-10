@@ -13,7 +13,7 @@ import (
 // this is used both in the main logger, and in each output
 var optionsWhitelist options.ValidOptions
 
-func init() {
+func initOptionsWhitelist() {
 	// setup the list of options that are supported
 	optionsWhitelist = make(options.ValidOptions)
 	optionsWhitelist["minLogLevel"] = "modlog.LogLevel"
