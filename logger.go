@@ -8,6 +8,8 @@ import (
 	_ "log"
 	"os"
 	"sync"
+
+	"github.com/stuartherbert/go_options"
 )
 
 // See https://tools.ietf.org/html/rfc5424 for a list of the official
@@ -27,6 +29,9 @@ type Logger struct {
 	// log package
 	StdlibPrefix string
 
+	// Settings is a generic databag
+	Options *options.OptionsStore
+
 	// avoids race conditions
 	mu sync.Mutex
 }
@@ -43,15 +48,16 @@ func New(out io.Writer, prefix string, flag int) *Logger {
 }
 
 // NewLogger() is a flexible alternative to New()
-func NewLogger(options ...LogOption) *Logger {
+func NewLogger(logOptions ...LogOption) *Logger {
 	// create a new logger
 	retval := &Logger{
 		Outputs: make(map[string]LogOutput),
 		Filters: make(map[string]LogFilter),
+		Options: options.NewOptionsStore(optionsWhitelist),
 	}
 
 	// apply any user-provided options
-	for _, option := range options {
+	for _, option := range logOptions {
 		err := option(retval)
 		if err != nil {
 			// well that's no good :(
@@ -77,10 +83,6 @@ func NewLogger(options ...LogOption) *Logger {
 // there is at least one output to write to
 func (self *Logger) createDefaultOutput(out io.Writer) {
 	self.AddOutput("default", out)
-}
-
-func (self *Logger) setDefaultFilters() {
-	self.AddFilter(LogLevelFilter, RestrictToLogLevel)
 }
 
 func (self *Logger) AddOutput(name string, out io.Writer) {
@@ -120,7 +122,7 @@ func (self *Logger) processEntry(entry *LogEntry) {
 
 	// does this entry pass the filters?
 	for _, filter := range self.Filters {
-		ok := filter(self, entry)
+		ok := filter(self.Options, entry)
 		if !ok {
 			// we're done
 			return

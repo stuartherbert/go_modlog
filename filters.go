@@ -2,11 +2,15 @@
 // Released under a 3-clause BSD license
 package modlog
 
+import (
+	"github.com/stuartherbert/go_options"
+)
+
 // a Filter is a function that takes a log entry, and decides whether or not
 // the entry can be logged
-type LogFilter func(*Logger, *LogEntry) bool
+type LogFilter func(*options.OptionsStore, *LogEntry) bool
 
-type FilterableLog interface {
+type Filterable interface {
 	AddFilter(string, LogFilter)
 	RemoveFilter(string)
 }
@@ -16,9 +20,17 @@ const (
 	LogLevelFilter = "loglevel"
 )
 
-func RestrictToLogLevel(logger *Logger, entry *LogEntry) bool {
+func FilterLogToMinLevel(os *options.OptionsStore, entry *LogEntry) bool {
+	// do we have a minimum level to look out for?
+	option, ok := os.Option("minLogLevel")
+	if !ok {
+		// no we do not
+		return true
+	}
+
+	minLogLevel := option.(LogLevel)
 	// is the entry at a log level we are interested in?
-	if entry.LogLevel <= logger.MinLogLevel {
+	if entry.LogLevel <= minLogLevel {
 		return true
 	}
 

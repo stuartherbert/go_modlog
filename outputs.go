@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"sync"
+
+	"github.com/stuartherbert/go_options"
 )
 
 // OutputWriter is the function that does the final writing to the output
@@ -26,6 +28,7 @@ type LogOutput struct {
 	Formatters map[string]LogFormatter
 	mu         sync.Mutex
 	Writer     OutputWriter
+	Options    *options.OptionsStore
 }
 
 // NewLogOutput() creates a new LogOutput
@@ -35,6 +38,7 @@ func NewLogOutput(out io.Writer, writer OutputWriter) *LogOutput {
 		Filters:    make(map[string]LogFilter),
 		Formatters: make(map[string]LogFormatter),
 		Writer:     writer,
+		Options:    options.NewOptionsStore(optionsWhitelist),
 	}
 
 	return retval
@@ -74,7 +78,7 @@ func (self *LogOutput) ProcessEntry(logger *Logger, entry *LogEntry) {
 
 	// does the log entry pass our filters?
 	for _, filter := range self.Filters {
-		ok := filter(logger, entry)
+		ok := filter(self.Options, entry)
 		if !ok {
 			// we're done here
 			return

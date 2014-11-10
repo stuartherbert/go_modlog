@@ -4,7 +4,20 @@ package modlog
 
 import (
 	"io"
+
+	"github.com/stuartherbert/go_options"
 )
+
+// the default list of options that we support
+//
+// this is used both in the main logger, and in each output
+var optionsWhitelist options.ValidOptions
+
+func init() {
+	// setup the list of options that are supported
+	optionsWhitelist = make(options.ValidOptions)
+	optionsWhitelist["minLogLevel"] = "modlog.LogLevel"
+}
 
 // LogOption is the signature that all logging option functions must match
 //
@@ -34,6 +47,22 @@ func SetStdlibFlags(flags int) LogOption {
 func SetStdlibPrefix(prefix string) LogOption {
 	return func(self *Logger) error {
 		self.SetPrefix(prefix)
+		return nil
+	}
+}
+
+// SetMinLogLevel() tells the logger to filter out some types of log messages
+func SetMinLogLevel(level LogLevel) LogOption {
+	return func(self *Logger) error {
+		// record the log level
+		self.Options.SetOption("minLogLevel", level)
+
+		// add the required filter if needed
+		if level < TraceLevel {
+			self.AddFilter(LogLevelFilter, FilterLogToMinLevel)
+		} else {
+			self.RemoveFilter(LogLevelFilter)
+		}
 		return nil
 	}
 }
