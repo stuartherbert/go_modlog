@@ -19,7 +19,8 @@ type FormattableLog interface {
 
 // a list of the standard slots to insert formatters into
 const (
-	TimestampFormatter = "timestamp"
+	FormatTimestamp = "timestamp"
+	FormatLogLevel  = "loglevel"
 )
 
 // DateTimeFormatter converts the 'When' field to the date/time format
@@ -55,4 +56,12 @@ func StdlibDateTimeFormatter(logger *Logger, entry *LogEntry) string {
 
 	// all done
 	return output
+}
+
+func StandardLogLevelFormatter(logger *Logger, entry *LogEntry) string {
+	return fmt.Sprintf("%-9s", entry.LogLevel.String())
+}
+
+func ShortLogLevelFormatter(logger *Logger, entry *LogEntry) string {
+	return entry.LogLevel.ShortString()
 }

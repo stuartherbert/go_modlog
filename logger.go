@@ -95,7 +95,8 @@ func (self *Logger) AddOutput(name string, out io.Writer) {
 	defer self.mu.Unlock()
 
 	output := NewLogOutput(out, DefaultOutputWriter)
-	output.AddFormatter(TimestampFormatter, StdlibDateTimeFormatter)
+	output.AddFormatter(FormatTimestamp, StdlibDateTimeFormatter)
+	output.AddFormatter(FormatLogLevel, ShortLogLevelFormatter)
 
 	self.Outputs[name] = *output
 }

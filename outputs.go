@@ -15,9 +15,9 @@ type OutputWriter func(io.Writer, *LogEntry, map[string]string)
 
 func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
 	if len(entry.Module) > 0 {
-		fmt.Fprintf(out, "%s| %s: %s", data["time"], entry.Module, entry.Message)
+		fmt.Fprintf(out, "%s|%s|%s: %s", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
 	} else {
-		fmt.Fprintf(out, "%s| %s", data["time"], entry.Message)
+		fmt.Fprintf(out, "%s|%s|%s", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
 	}
 }
 
