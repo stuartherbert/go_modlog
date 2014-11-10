@@ -38,3 +38,35 @@ var LogLevels = map[string]LogLevel{
 	"panic":     0,
 	"fatal":     0,
 }
+
+var LogLevelNames = map[LogLevel]string{
+	EmergencyLevel: "EMERGENCY",
+	AlertLevel:     "ALERT",
+	CriticalLevel:  "CRITICAL",
+	ErrorLevel:     "ERROR",
+	WarnLevel:      "WARNING",
+	NoticeLevel:    "NOTICE",
+	InfoLevel:      "INFO",
+	DebugLevel:     "DEBUG",
+	TraceLevel:     "TRACE",
+}
+
+var LogLevelShortNames = map[LogLevel]string{
+	EmergencyLevel: "EMERG ",
+	AlertLevel:     "ALERT ",
+	CriticalLevel:  "CRIT  ",
+	ErrorLevel:     "ERROR ",
+	WarnLevel:      "WARN  ",
+	NoticeLevel:    "NOTICE",
+	InfoLevel:      "INFO  ",
+	DebugLevel:     "DEBUG ",
+	TraceLevel:     "TRACE ",
+}
+
+func (self *LogLevel) String() string {
+	return LogLevelNames[*self]
+}
+
+func (self *LogLevel) ShortString() string {
+	return LogLevelShortNames[*self]
+}
