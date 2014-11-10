@@ -56,17 +56,7 @@ func NewLogger(logOptions ...LogOption) *Logger {
 		Options: options.NewOptionsStore(optionsWhitelist),
 	}
 
-	// apply any user-provided options
-	for _, option := range logOptions {
-		err := option(retval)
-		if err != nil {
-			// well that's no good :(
-			//
-			// as logging is a fundamental component, treat errors here
-			// as fatal
-			panic(fmt.Sprintf("Unable to set log option; error is: %s\n", err.Error()))
-		}
-	}
+	retval.SetOptions(logOptions...)
 
 	// make sure that we have at least one output
 	if len(retval.Outputs) == 0 {
@@ -83,6 +73,21 @@ func NewLogger(logOptions ...LogOption) *Logger {
 // there is at least one output to write to
 func (self *Logger) createDefaultOutput(out io.Writer) {
 	self.AddOutput("default", out)
+}
+
+// SetOptions applies the list of options to the current logger
+func (self *Logger) SetOptions(logOptions ...LogOption) {
+	// apply any user-provided options
+	for _, option := range logOptions {
+		err := option(self)
+		if err != nil {
+			// well that's no good :(
+			//
+			// as logging is a fundamental component, treat errors here
+			// as fatal
+			panic(fmt.Sprintf("Unable to set log option; error is: %s\n", err.Error()))
+		}
+	}
 }
 
 func (self *Logger) AddOutput(name string, out io.Writer) {

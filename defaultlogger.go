@@ -12,6 +12,10 @@ func init() {
 	defaultLogger = NewLogger()
 }
 
+func SetOptions(logOptions ...LogOption) {
+	defaultLogger.SetOptions(logOptions...)
+}
+
 func Tracef(format string, args ...interface{}) {
 	defaultLogger.Tracef(format, args...)
 }
