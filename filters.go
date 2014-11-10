@@ -3,6 +3,7 @@
 package modlog
 
 import (
+	_ "fmt"
 	"github.com/stuartherbert/go_options"
 )
 
@@ -28,7 +29,9 @@ func FilterLogToMinLevel(os *options.OptionsStore, entry *LogEntry) bool {
 		return true
 	}
 
+	// typecast so that we can do the comparison
 	minLogLevel := option.(LogLevel)
+
 	// is the entry at a log level we are interested in?
 	if entry.LogLevel <= minLogLevel {
 		return true
