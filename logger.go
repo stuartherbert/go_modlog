@@ -153,7 +153,7 @@ func (self *Logger) Trace(args ...interface{}) {
 }
 
 func (self *Logger) Traceln(args ...interface{}) {
-	entry := NewLogEntry(TraceLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(TraceLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -168,7 +168,7 @@ func (self *Logger) Debug(args ...interface{}) {
 }
 
 func (self *Logger) Debugln(args ...interface{}) {
-	entry := NewLogEntry(DebugLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(DebugLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -183,7 +183,7 @@ func (self *Logger) Info(args ...interface{}) {
 }
 
 func (self *Logger) Infoln(args ...interface{}) {
-	entry := NewLogEntry(InfoLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(InfoLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -198,7 +198,7 @@ func (self *Logger) Notice(args ...interface{}) {
 }
 
 func (self *Logger) Noticeln(args ...interface{}) {
-	entry := NewLogEntry(NoticeLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(NoticeLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -213,7 +213,7 @@ func (self *Logger) Warn(args ...interface{}) {
 }
 
 func (self *Logger) Warnln(args ...interface{}) {
-	entry := NewLogEntry(WarnLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(WarnLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -228,7 +228,7 @@ func (self *Logger) Error(args ...interface{}) {
 }
 
 func (self *Logger) Errorln(args ...interface{}) {
-	entry := NewLogEntry(ErrorLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(ErrorLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -243,7 +243,7 @@ func (self *Logger) Critical(args ...interface{}) {
 }
 
 func (self *Logger) Criticalln(args ...interface{}) {
-	entry := NewLogEntry(CriticalLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(CriticalLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -259,7 +259,7 @@ func (self *Logger) Alert(args ...interface{}) {
 }
 
 func (self *Logger) Alertln(args ...interface{}) {
-	entry := NewLogEntry(AlertLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(AlertLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -274,7 +274,7 @@ func (self *Logger) Emergency(args ...interface{}) {
 
 }
 func (self *Logger) Emergencyln(args ...interface{}) {
-	entry := NewLogEntry(EmergencyLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(EmergencyLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -290,7 +290,7 @@ func (self *Logger) Fatalf(format string, args ...interface{}) {
 }
 
 func (self *Logger) Fatalln(args ...interface{}) {
-	entry := NewLogEntry(FatalLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(FatalLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 
 }
@@ -316,7 +316,7 @@ func (self *Logger) Panicf(format string, args ...interface{}) {
 }
 
 func (self *Logger) Panicln(args ...interface{}) {
-	entry := NewLogEntry(PanicLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(PanicLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
 }
 
@@ -338,8 +338,29 @@ func (self *Logger) Printf(format string, args ...interface{}) {
 }
 
 func (self *Logger) Println(args ...interface{}) {
-	entry := NewLogEntry(InfoLevel, "", fmt.Sprintln(args...))
+	entry := NewLogEntry(InfoLevel, "", self.sprintnln(args...))
 	self.processEntry(entry)
+}
+
+// sprintnln() emulates fmt.Sprintln()'s append behaviour, something that
+// fmt.Sprint(args...) does not give us :(
+func (self *Logger) sprintnln(args ...interface{}) string {
+	if len(args) == 1 {
+		return fmt.Sprintln(args)
+	} else {
+		retval := ""
+		appendSpace := false
+		for _, arg := range args {
+			if appendSpace {
+				retval = retval + " " + fmt.Sprint(arg)
+			} else {
+				retval = fmt.Sprint(arg)
+				appendSpace = true
+			}
+		}
+
+		return retval
+	}
 }
 
 // SetFlags() allows you to set the flags that are also supported by the
@@ -358,6 +379,7 @@ func (self *Logger) SetPrefix(prefix string) {
 	self.StdlibPrefix = prefix
 }
 
+// SetOutput() allows you to set the output to write log messages to
 func (self *Logger) SetOutput(out io.Writer) {
 	self.AddOutput("default", out).
 		AddFormatter(FormatTimestamp, StdlibDateTimeFormatter).

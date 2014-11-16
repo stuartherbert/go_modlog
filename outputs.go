@@ -15,19 +15,19 @@ type OutputWriter func(io.Writer, *LogEntry, map[string]string)
 
 func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
 	if len(entry.Module) > 0 {
-		fmt.Fprintf(out, "%s|%s|%s: %s", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
+		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
 	} else {
-		fmt.Fprintf(out, "%s|%s|%s", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
+		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
 	}
 }
 
 func StdlibOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
 	if len(entry.Module) > 0 {
-		fmt.Fprintf(out, "%s %s: %s", data[FormatTimestamp], entry.Module, entry.Message)
+		fmt.Fprintf(out, "%s %s: %s\n", data[FormatTimestamp], entry.Module, entry.Message)
 	} else if len(data[FormatTimestamp]) > 0 {
-		fmt.Fprintf(out, "%s %s", data[FormatTimestamp], entry.Message)
+		fmt.Fprintf(out, "%s %s\n", data[FormatTimestamp], entry.Message)
 	} else {
-		fmt.Fprint(out, entry.Message)
+		fmt.Fprintln(out, entry.Message)
 	}
 }
 
