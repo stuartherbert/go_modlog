@@ -36,7 +36,11 @@ func StdlibDateTimeFormatter(logger *Logger, entry *LogEntry) string {
 	}
 
 	// what about the time?
-	if logger.StdlibFlags&log.Ltime != 0 {
+	//
+	// note: Ltime is optional if Lmicroseconds is set
+	//
+	// Implicit behaviour :(
+	if logger.StdlibFlags&log.Ltime != 0 || logger.StdlibFlags&log.Lmicroseconds != 0 {
 		if len(output) > 0 {
 			output = output + " "
 		}
@@ -47,10 +51,6 @@ func StdlibDateTimeFormatter(logger *Logger, entry *LogEntry) string {
 
 	// nanoseconds, anyone?
 	if logger.StdlibFlags&log.Lmicroseconds != 0 {
-		if len(output) > 0 {
-			output = output + " "
-		}
-
 		ms := entry.When.Nanosecond() / 1e3
 		output = output + fmt.Sprintf(".%06d", ms)
 	}
