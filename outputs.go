@@ -14,7 +14,7 @@ import (
 type OutputWriter func(io.Writer, *LogEntry, map[string]string)
 
 func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
-	if len(entry.Module) > 0 {
+	if len(data[FormatModule]) > 0 {
 		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
 	} else {
 		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
@@ -22,13 +22,20 @@ func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string)
 }
 
 func StdlibOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
-	if len(entry.Module) > 0 {
-		fmt.Fprintf(out, "%s %s: %s\n", data[FormatTimestamp], entry.Module, entry.Message)
-	} else if len(data[FormatTimestamp]) > 0 {
-		fmt.Fprintf(out, "%s %s\n", data[FormatTimestamp], entry.Message)
-	} else {
-		fmt.Fprintln(out, entry.Message)
+	// the upstream_test.go is picky about whitespace in output
+	hasTimestamp := (len(data[FormatTimestamp]) > 0)
+	hasPrefix := (len(data[FormatModule]) > 0)
+
+	if hasTimestamp {
+		// timestamps always have a space after them
+		fmt.Fprintf(out, "%s ", data[FormatTimestamp])
 	}
+	if hasPrefix {
+		// the prefix never has a space after it
+		fmt.Fprint(out, data[FormatModule])
+	}
+	// whatever happens, we want to print the message followed by a newline
+	fmt.Fprintln(out, entry.Message)
 }
 
 // LogOutput represents a single log destination

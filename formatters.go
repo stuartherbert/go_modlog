@@ -21,6 +21,7 @@ type FormattableLog interface {
 const (
 	FormatTimestamp = "timestamp"
 	FormatLogLevel  = "loglevel"
+	FormatModule    = "module"
 )
 
 // DateTimeFormatter converts the 'When' field to the date/time format
@@ -64,4 +65,8 @@ func StandardLogLevelFormatter(logger *Logger, entry *LogEntry) string {
 
 func ShortLogLevelFormatter(logger *Logger, entry *LogEntry) string {
 	return entry.LogLevel.ShortString()
+}
+
+func StdlibPrefixFormatter(logger *Logger, entry *LogEntry) string {
+	return logger.StdlibPrefix
 }

@@ -383,5 +383,6 @@ func (self *Logger) SetPrefix(prefix string) {
 func (self *Logger) SetOutput(out io.Writer) {
 	self.AddOutput("default", out).
 		AddFormatter(FormatTimestamp, StdlibDateTimeFormatter).
+		AddFormatter(FormatModule, StdlibPrefixFormatter).
 		SetWriter(StdlibOutputWriter)
 }
