@@ -3,7 +3,9 @@
 package modlog
 
 import (
+	"io"
 	"log"
+	"os"
 )
 
 // if the user just wants to use us as a drop-in replacement for the stdlib's
@@ -16,6 +18,7 @@ func init() {
 	defaultLogger = NewLogger(
 		SetStdlibFlags(log.LstdFlags),
 	)
+	defaultLogger.SetOutput(os.Stdout)
 }
 
 func SetOptions(logOptions ...LogOption) {
@@ -178,4 +181,8 @@ func SetFlags(flags int) {
 
 func SetPrefix(prefix string) {
 	defaultLogger.SetPrefix(prefix)
+}
+
+func SetOutput(out io.Writer) {
+	defaultLogger.SetOutput(out)
 }

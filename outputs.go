@@ -21,6 +21,16 @@ func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string)
 	}
 }
 
+func StdlibOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
+	if len(entry.Module) > 0 {
+		fmt.Fprintf(out, "%s %s: %s", data[FormatTimestamp], entry.Module, entry.Message)
+	} else if len(data[FormatTimestamp]) > 0 {
+		fmt.Fprintf(out, "%s %s", data[FormatTimestamp], entry.Message)
+	} else {
+		fmt.Fprint(out, entry.Message)
+	}
+}
+
 // LogOutput represents a single log destination
 type LogOutput struct {
 	Out        io.Writer
@@ -44,32 +54,45 @@ func NewLogOutput(out io.Writer, writer OutputWriter) *LogOutput {
 	return retval
 }
 
-func (self *LogOutput) AddFilter(name string, filter LogFilter) {
+func (self *LogOutput) AddFilter(name string, filter LogFilter) *LogOutput {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	self.Filters[name] = filter
+
+	return self
 }
 
-func (self *LogOutput) RemoveFilter(name string) {
+func (self *LogOutput) RemoveFilter(name string) *LogOutput {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	delete(self.Filters, name)
+
+	return self
 }
 
-func (self *LogOutput) AddFormatter(name string, formatter LogFormatter) {
+func (self *LogOutput) AddFormatter(name string, formatter LogFormatter) *LogOutput {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	self.Formatters[name] = formatter
+
+	return self
 }
 
-func (self *LogOutput) RemoveFormatter(name string) {
+func (self *LogOutput) RemoveFormatter(name string) *LogOutput {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	delete(self.Formatters, name)
+
+	return self
+}
+
+func (self *LogOutput) SetWriter(writer OutputWriter) *LogOutput {
+	self.Writer = writer
+	return self
 }
 
 func (self *LogOutput) ProcessEntry(logger *Logger, entry *LogEntry) {

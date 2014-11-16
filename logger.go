@@ -20,7 +20,7 @@ type Logger struct {
 	Filters map[string]LogFilter
 
 	// the different outputs to write to
-	Outputs map[string]LogOutput
+	Outputs map[string]*LogOutput
 
 	// StdlibFlags are the flags also supported by the stdlib's log package
 	StdlibFlags int
@@ -51,7 +51,7 @@ func New(out io.Writer, prefix string, flag int) *Logger {
 func NewLogger(logOptions ...LogOption) *Logger {
 	// create a new logger
 	retval := &Logger{
-		Outputs: make(map[string]LogOutput),
+		Outputs: make(map[string]*LogOutput),
 		Filters: make(map[string]LogFilter),
 		Options: options.NewOptionsStore(optionsWhitelist),
 	}
@@ -72,7 +72,9 @@ func NewLogger(logOptions ...LogOption) *Logger {
 // This is called from our New() and NewLogger() functions to ensure that
 // there is at least one output to write to
 func (self *Logger) createDefaultOutput(out io.Writer) {
-	self.AddOutput("default", out)
+	output := self.AddOutput("default", out)
+	output.AddFormatter(FormatTimestamp, StdlibDateTimeFormatter).
+		AddFormatter(FormatLogLevel, ShortLogLevelFormatter)
 }
 
 // SetOptions applies the list of options to the current logger
@@ -90,15 +92,14 @@ func (self *Logger) SetOptions(logOptions ...LogOption) {
 	}
 }
 
-func (self *Logger) AddOutput(name string, out io.Writer) {
+func (self *Logger) AddOutput(name string, out io.Writer) *LogOutput {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	output := NewLogOutput(out, DefaultOutputWriter)
-	output.AddFormatter(FormatTimestamp, StdlibDateTimeFormatter)
-	output.AddFormatter(FormatLogLevel, ShortLogLevelFormatter)
 
-	self.Outputs[name] = *output
+	self.Outputs[name] = output
+	return output
 }
 
 func (self *Logger) RemoveOutput(name string) {
@@ -341,6 +342,8 @@ func (self *Logger) Println(args ...interface{}) {
 	self.processEntry(entry)
 }
 
+// SetFlags() allows you to set the flags that are also supported by the
+// stdlib's log package
 func (self *Logger) SetFlags(flag int) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
@@ -353,4 +356,10 @@ func (self *Logger) SetPrefix(prefix string) {
 	defer self.mu.Unlock()
 
 	self.StdlibPrefix = prefix
+}
+
+func (self *Logger) SetOutput(out io.Writer) {
+	self.AddOutput("default", out).
+		AddFormatter(FormatTimestamp, StdlibDateTimeFormatter).
+		SetWriter(StdlibOutputWriter)
 }

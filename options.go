@@ -29,7 +29,7 @@ type LogOption func(*Logger) error
 // SetDefaultOutput() tells the logger to write to the given output
 func SetDefaultOutput(out io.Writer) LogOption {
 	return func(self *Logger) error {
-		self.AddOutput("default", out)
+		self.SetOutput(out)
 		return nil
 	}
 }
