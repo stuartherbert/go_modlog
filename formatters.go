@@ -5,6 +5,8 @@ package modlog
 import (
 	"fmt"
 	"log"
+	"path"
+	"runtime"
 )
 
 // LogFormatter is the signature that all output formatters much satisfy
@@ -22,6 +24,7 @@ const (
 	FormatTimestamp = "timestamp"
 	FormatLogLevel  = "loglevel"
 	FormatModule    = "module"
+	FormatFilename  = "filename"
 )
 
 // DateTimeFormatter converts the 'When' field to the date/time format
@@ -69,4 +72,23 @@ func ShortLogLevelFormatter(logger *Logger, entry *LogEntry) string {
 
 func StdlibPrefixFormatter(logger *Logger, entry *LogEntry) string {
 	return logger.StdlibPrefix
+}
+
+func StdlibFileFormatter(logger *Logger, entry *LogEntry) string {
+	if logger.StdlibFlags&(Lshortfile|Llongfile) == 0 {
+		return ""
+	}
+
+	// get the caller
+	_, file, line, ok := runtime.Caller(5)
+	if !ok {
+		return "unknown:00"
+	}
+
+	// Lshortfile overrides Llongfile in the upstream_tests
+	if logger.StdlibFlags&Lshortfile != 0 {
+		return fmt.Sprintf("%s:%d", path.Base(file), line)
+	} else {
+		return fmt.Sprintf("%s:%d", file, line)
+	}
 }

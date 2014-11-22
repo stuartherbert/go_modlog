@@ -384,5 +384,6 @@ func (self *Logger) SetOutput(out io.Writer) {
 	self.AddOutput("default", out).
 		AddFormatter(FormatTimestamp, StdlibDateTimeFormatter).
 		AddFormatter(FormatModule, StdlibPrefixFormatter).
+		AddFormatter(FormatFilename, StdlibFileFormatter).
 		SetWriter(StdlibOutputWriter)
 }

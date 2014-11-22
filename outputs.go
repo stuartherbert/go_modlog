@@ -3,7 +3,8 @@
 package modlog
 
 import (
-	"fmt"
+	"bytes"
+	_ "fmt"
 	"io"
 	"sync"
 
@@ -14,28 +15,64 @@ import (
 type OutputWriter func(io.Writer, *LogEntry, map[string]string)
 
 func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
-	if len(data[FormatModule]) > 0 {
-		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
-	} else {
-		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
+	// fmt.Printf("data: %+v\n", data)
+	buf := new(bytes.Buffer)
+
+	if len(data[FormatTimestamp]) > 0 {
+		buf.WriteString(data[FormatTimestamp])
+		buf.WriteString(" ")
 	}
+	if len(data[FormatFilename]) > 0 {
+		buf.WriteString(data[FormatFilename])
+		buf.WriteString(" ")
+	}
+	if len(data[FormatLogLevel]) > 0 {
+		buf.WriteString(data[FormatLogLevel])
+	}
+	if len(data[FormatModule]) > 0 {
+		buf.WriteString(data[FormatModule])
+	}
+	buf.WriteString(entry.Message)
+	buf.WriteString("\n")
+	out.Write(buf.Bytes())
+
+	// if len(data[FormatFilename] > 0) {
+	// 	if len(data[FormatModule]) > 0 {
+	// 		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
+	// 	} else {
+	// 		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
+	// 	}
+	// } else {
+	// 	if len(data[FormatModule]) > 0 {
+	// 		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
+	// 	} else {
+	// 		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
+	// 	}
+	// }
 }
 
 func StdlibOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
 	// the upstream_test.go is picky about whitespace in output
-	hasTimestamp := (len(data[FormatTimestamp]) > 0)
-	hasPrefix := (len(data[FormatModule]) > 0)
+	//hasTimestamp := (len(data[FormatTimestamp]) > 0)
+	//hasPrefix := (len(data[FormatModule]) > 0)
 
-	if hasTimestamp {
-		// timestamps always have a space after them
-		fmt.Fprintf(out, "%s ", data[FormatTimestamp])
+	// fmt.Printf("data: %+v\n", data)
+	buf := new(bytes.Buffer)
+
+	if len(data[FormatModule]) > 0 {
+		buf.WriteString(data[FormatModule])
 	}
-	if hasPrefix {
-		// the prefix never has a space after it
-		fmt.Fprint(out, data[FormatModule])
+	if len(data[FormatTimestamp]) > 0 {
+		buf.WriteString(data[FormatTimestamp])
+		buf.WriteString(" ")
 	}
-	// whatever happens, we want to print the message followed by a newline
-	fmt.Fprintln(out, entry.Message)
+	if len(data[FormatFilename]) > 0 {
+		buf.WriteString(data[FormatFilename])
+		buf.WriteString(": ")
+	}
+	buf.WriteString(entry.Message)
+	buf.WriteString("\n")
+	out.Write(buf.Bytes())
 }
 
 // LogOutput represents a single log destination
