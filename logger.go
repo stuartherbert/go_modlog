@@ -346,7 +346,7 @@ func (self *Logger) Println(args ...interface{}) {
 // fmt.Sprint(args...) does not give us :(
 func (self *Logger) sprintnln(args ...interface{}) string {
 	if len(args) == 1 {
-		return fmt.Sprintln(args)
+		return fmt.Sprint(args...)
 	} else {
 		retval := ""
 		appendSpace := false
