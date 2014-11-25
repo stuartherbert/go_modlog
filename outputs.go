@@ -15,48 +15,32 @@ import (
 type OutputWriter func(io.Writer, *LogEntry, map[string]string)
 
 func DefaultOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
-	// fmt.Printf("data: %+v\n", data)
+	//fmt.Printf("(default) data: %+v\n", data)
 	buf := new(bytes.Buffer)
 
 	if len(data[FormatTimestamp]) > 0 {
 		buf.WriteString(data[FormatTimestamp])
-		buf.WriteString(" ")
+		buf.WriteString("|")
 	}
 	if len(data[FormatFilename]) > 0 {
 		buf.WriteString(data[FormatFilename])
-		buf.WriteString(" ")
+		buf.WriteString("|")
 	}
 	if len(data[FormatLogLevel]) > 0 {
 		buf.WriteString(data[FormatLogLevel])
+		buf.WriteString("|")
 	}
 	if len(data[FormatModule]) > 0 {
 		buf.WriteString(data[FormatModule])
+		buf.WriteString(": ")
 	}
 	buf.WriteString(entry.Message)
 	buf.WriteString("\n")
 	out.Write(buf.Bytes())
-
-	// if len(data[FormatFilename] > 0) {
-	// 	if len(data[FormatModule]) > 0 {
-	// 		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
-	// 	} else {
-	// 		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
-	// 	}
-	// } else {
-	// 	if len(data[FormatModule]) > 0 {
-	// 		fmt.Fprintf(out, "%s|%s|%s: %s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Module, entry.Message)
-	// 	} else {
-	// 		fmt.Fprintf(out, "%s|%s|%s\n", data[FormatTimestamp], data[FormatLogLevel], entry.Message)
-	// 	}
-	// }
 }
 
 func StdlibOutputWriter(out io.Writer, entry *LogEntry, data map[string]string) {
-	// the upstream_test.go is picky about whitespace in output
-	//hasTimestamp := (len(data[FormatTimestamp]) > 0)
-	//hasPrefix := (len(data[FormatModule]) > 0)
-
-	// fmt.Printf("data: %+v\n", data)
+	//fmt.Printf("(stdlib) data: %+v\n", data)
 	buf := new(bytes.Buffer)
 
 	if len(data[FormatModule]) > 0 {
