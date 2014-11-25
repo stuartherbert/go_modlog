@@ -300,6 +300,18 @@ func (self *Logger) Println(args ...interface{}) {
 	self.AddLogEntry(InfoLevel, "", extrafmt.Sprintnln(args...))
 }
 
+func (self *Logger) Write(level LogLevel, args ...interface{}) {
+	self.AddLogEntry(level, "", fmt.Sprint(args...))
+}
+
+func (self *Logger) Writef(level LogLevel, format string, args ...interface{}) {
+	self.AddLogEntry(level, "", fmt.Sprintf(format, args...))
+}
+
+func (self *Logger) Writeln(level LogLevel, args ...interface{}) {
+	self.AddLogEntry(level, "", extrafmt.Sprintnln(args...))
+}
+
 func (self *Logger) Flags() int {
 	self.mu.Lock()
 	defer self.mu.Unlock()
