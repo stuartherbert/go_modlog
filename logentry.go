@@ -3,6 +3,7 @@
 package modlog
 
 import (
+	_ "fmt"
 	"time"
 )
 
@@ -40,6 +41,8 @@ func NewLogEntry(level LogLevel, module string, message string) *LogEntry {
 		Data:     make(LogFields, 5),
 		When:     time.Now(),
 	}
+
+	//fmt.Printf("new log entry: %+v\n", retval)
 
 	// all done
 	return retval
