@@ -80,7 +80,7 @@ func StdlibFileFormatter(logger *Logger, entry *LogEntry) string {
 	}
 
 	// get the caller
-	_, file, line, ok := runtime.Caller(6)
+	_, file, line, ok := runtime.Caller(5)
 	if !ok {
 		return "unknown:00"
 	}
