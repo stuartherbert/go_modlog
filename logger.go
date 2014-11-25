@@ -110,6 +110,14 @@ func (self *Logger) RemoveOutput(name string) {
 	delete(self.Outputs, name)
 }
 
+func (self *Logger) GetOutput(name string) *LogOutput {
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	output, _ := self.Outputs[name]
+	return output
+}
+
 func (self *Logger) AddFilter(name string, filter LogFilter) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
